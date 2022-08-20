@@ -1,0 +1,16 @@
+*.suo
+*.user
+*.exe
+*.pubxml
+*.publishsettings
+.vs/
+packages/
+.vs/
+bin/
+debug/
+release/
+obj/
+csx/
+node_modules/
+
+
