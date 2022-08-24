@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EF_DDD.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20220820160519_init")]
+    [Migration("20220820191335_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,46 +29,11 @@ namespace EF_DDD.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
-                        .HasColumnName("ContractingCompany_Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("ContractingCompany");
-                });
-
-            modelBuilder.Entity("EF_DDD.DDD.ContractingCompanyDdd", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("Id")
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnName("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ContractingCompany");
-                });
-
-            modelBuilder.Entity("EF_DDD.DDD.ContractorEx", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("Id")
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ContractorId")
-                        .HasColumnName("ContractorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Person");
                 });
 
             modelBuilder.Entity("EF_DDD.Person", b =>
@@ -104,17 +69,10 @@ namespace EF_DDD.Migrations
                     b.Property<int?>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ContractingCompanyDddId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ContractorId")
+                    b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("ContractingCompanyDddId");
-
-                    b.ToTable("Person1");
 
                     b.HasDiscriminator().HasValue("Contractor");
                 });
@@ -126,27 +84,7 @@ namespace EF_DDD.Migrations
                     b.Property<int>("Grade")
                         .HasColumnType("int");
 
-                    b.ToTable("Person2");
-
                     b.HasDiscriminator().HasValue("Employee");
-                });
-
-            modelBuilder.Entity("EF_DDD.DDD.ContractingCompanyDdd", b =>
-                {
-                    b.HasOne("EF_DDD.ContractingCompany", null)
-                        .WithOne()
-                        .HasForeignKey("EF_DDD.DDD.ContractingCompanyDdd", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EF_DDD.DDD.ContractorEx", b =>
-                {
-                    b.HasOne("EF_DDD.Person", null)
-                        .WithOne()
-                        .HasForeignKey("EF_DDD.DDD.ContractorEx", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("EF_DDD.Person", b =>
@@ -161,10 +99,6 @@ namespace EF_DDD.Migrations
                     b.HasOne("EF_DDD.ContractingCompany", "Company")
                         .WithMany("Contractors")
                         .HasForeignKey("CompanyId");
-
-                    b.HasOne("EF_DDD.DDD.ContractingCompanyDdd", null)
-                        .WithMany("Contractors")
-                        .HasForeignKey("ContractingCompanyDddId");
                 });
 #pragma warning restore 612, 618
         }

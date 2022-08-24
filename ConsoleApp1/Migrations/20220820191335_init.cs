@@ -12,7 +12,6 @@ namespace EF_DDD.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractingCompany_Name = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -29,9 +28,8 @@ namespace EF_DDD.Migrations
                     Name = table.Column<string>(nullable: true),
                     ManagerId = table.Column<int>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false),
-                    ContractorId = table.Column<int>(nullable: true),
+                    EmployeeId = table.Column<int>(nullable: true),
                     CompanyId = table.Column<int>(nullable: true),
-                    ContractingCompanyDddId = table.Column<int>(nullable: true),
                     Grade = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -40,12 +38,6 @@ namespace EF_DDD.Migrations
                     table.ForeignKey(
                         name: "FK_Person_ContractingCompany_CompanyId",
                         column: x => x.CompanyId,
-                        principalTable: "ContractingCompany",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Person_ContractingCompany_ContractingCompanyDddId",
-                        column: x => x.ContractingCompanyDddId,
                         principalTable: "ContractingCompany",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -61,11 +53,6 @@ namespace EF_DDD.Migrations
                 name: "IX_Person_CompanyId",
                 table: "Person",
                 column: "CompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Person_ContractingCompanyDddId",
-                table: "Person",
-                column: "ContractingCompanyDddId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_ManagerId",

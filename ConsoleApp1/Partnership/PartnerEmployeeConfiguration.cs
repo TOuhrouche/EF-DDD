@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace EF_DDD.Partnership
 {
@@ -7,12 +9,20 @@ namespace EF_DDD.Partnership
     {
         public void Configure(EntityTypeBuilder<PartnerEmployee> builder)
         {
-            builder.ToTable("Person");
-            builder.HasKey(c => c.Id);
-            builder.Property(c => c.Id).HasColumnName("Id");
-            builder.Property(c => c.ContractorId).HasColumnName("ContractorId");
-            builder.Property<int?>("PartnerId").HasColumnName("CompanyId");
-            builder.HasOne<Contractor>().WithOne().HasForeignKey<PartnerEmployee>(c => c.Id);
+            builder.ToTable("Person").HasKey(c => c.Id);
+            builder.Property(c => c.EmployeeId).HasColumnName("EmployeeId");
+            builder.HasMany(e => e.Reports).WithOne(e => e.Manager);
+            builder.Property(e => e.Name).HasColumnName("Name");
+            builder.Property("PartnerId").HasColumnName("CompanyId");
+            builder.Property("ManagerId").HasColumnName("ManagerId");
+            builder.Property<string>("Discriminator").HasColumnName("Discriminator").HasValueGenerator<DiscriminatorValueGenerator>();
+        }
+
+        public class DiscriminatorValueGenerator : ValueGenerator<string>
+        {
+            public override string Next(EntityEntry _) => "Contractor";
+
+            public override bool GeneratesTemporaryValues => false;
         }
     }
 }

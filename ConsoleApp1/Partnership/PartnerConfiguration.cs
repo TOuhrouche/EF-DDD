@@ -7,11 +7,9 @@ namespace EF_DDD.Partnership
     {
         public void Configure(EntityTypeBuilder<Partner> builder)
         {
-            builder.ToTable("ContractingCompany");
-            builder.HasKey(c => c.Id);
-            builder.Property(c => c.Id).HasColumnName("Id");
+            builder.ToTable("ContractingCompany").HasKey(c => c.Id);
             builder.Property(c => c.Name).HasColumnName("Name");
-            builder.HasOne<ContractingCompany>().WithOne().HasForeignKey<Partner>(c => c.Id);
+            builder.HasMany(c => c.Employees).WithOne(e => e.Partner);
         }
     }
 }

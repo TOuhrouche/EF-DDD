@@ -27,7 +27,7 @@ namespace EF_DDD.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
-                        .HasColumnName("ContractingCompany_Name")
+                        .HasColumnName("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -35,11 +35,10 @@ namespace EF_DDD.Migrations
                     b.ToTable("ContractingCompany");
                 });
 
-            modelBuilder.Entity("EF_DDD.DDD.ContractingCompanyDdd", b =>
+            modelBuilder.Entity("EF_DDD.Partnership.Partner", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("Id")
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -52,19 +51,35 @@ namespace EF_DDD.Migrations
                     b.ToTable("ContractingCompany");
                 });
 
-            modelBuilder.Entity("EF_DDD.DDD.ContractorEx", b =>
+            modelBuilder.Entity("EF_DDD.Partnership.PartnerEmployee", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("Id")
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ContractorId")
-                        .HasColumnName("ContractorId")
+                    b.Property<int>("EmployeeId")
+                        .HasColumnName("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ManagerId")
+                        .HasColumnName("ManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnName("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PartnerId")
+                        .HasColumnName("CompanyId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ManagerId");
+
+                    b.HasIndex("PartnerId")
+                        .HasName("IX_Person_CompanyId1");
 
                     b.ToTable("Person");
                 });
@@ -81,9 +96,11 @@ namespace EF_DDD.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ManagerId")
+                        .HasColumnName("ManagerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .HasColumnName("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -100,19 +117,14 @@ namespace EF_DDD.Migrations
                     b.HasBaseType("EF_DDD.Person");
 
                     b.Property<int?>("CompanyId")
+                        .HasColumnName("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ContractingCompanyDddId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ContractorId")
+                    b.Property<int>("EmployeeId")
+                        .HasColumnName("EmployeeId")
                         .HasColumnType("int");
 
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("ContractingCompanyDddId");
-
-                    b.ToTable("Person1");
 
                     b.HasDiscriminator().HasValue("Contractor");
                 });
@@ -124,27 +136,34 @@ namespace EF_DDD.Migrations
                     b.Property<int>("Grade")
                         .HasColumnType("int");
 
-                    b.ToTable("Person2");
-
                     b.HasDiscriminator().HasValue("Employee");
                 });
 
-            modelBuilder.Entity("EF_DDD.DDD.ContractingCompanyDdd", b =>
+            modelBuilder.Entity("EF_DDD.Partnership.Partner", b =>
                 {
                     b.HasOne("EF_DDD.ContractingCompany", null)
                         .WithOne()
-                        .HasForeignKey("EF_DDD.DDD.ContractingCompanyDdd", "Id")
+                        .HasForeignKey("EF_DDD.Partnership.Partner", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EF_DDD.DDD.ContractorEx", b =>
+            modelBuilder.Entity("EF_DDD.Partnership.PartnerEmployee", b =>
                 {
                     b.HasOne("EF_DDD.Person", null)
                         .WithOne()
-                        .HasForeignKey("EF_DDD.DDD.ContractorEx", "Id")
+                        .HasForeignKey("EF_DDD.Partnership.PartnerEmployee", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("EF_DDD.Partnership.PartnerEmployee", "Manager")
+                        .WithMany("Reports")
+                        .HasForeignKey("ManagerId");
+
+                    b.HasOne("EF_DDD.Partnership.Partner", "Partner")
+                        .WithMany("Employees")
+                        .HasForeignKey("PartnerId")
+                        .HasConstraintName("FK_Person_ContractingCompany_CompanyId1");
                 });
 
             modelBuilder.Entity("EF_DDD.Person", b =>
@@ -159,10 +178,6 @@ namespace EF_DDD.Migrations
                     b.HasOne("EF_DDD.ContractingCompany", "Company")
                         .WithMany("Contractors")
                         .HasForeignKey("CompanyId");
-
-                    b.HasOne("EF_DDD.DDD.ContractingCompanyDdd", null)
-                        .WithMany("Contractors")
-                        .HasForeignKey("ContractingCompanyDddId");
                 });
 #pragma warning restore 612, 618
         }
