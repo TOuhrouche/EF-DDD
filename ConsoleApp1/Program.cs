@@ -20,10 +20,10 @@ namespace EF_DDD
             var employeeContext = new EmployeeContext(ConnectionString);
             var partnersContext = new PartnersContext(employeeContext.Database.GetDbConnection());
             var unitOfWork = new UnitOfWork();
-            //unitOfWork.Update(employeeContext, partnersContext, 1);
-            //unitOfWork.Update(employeeContext, partnersContext, 2);
-            await unitOfWork.UpdateUsingTransactionScope(employeeContext, partnersContext, 1);
-            await unitOfWork.UpdateUsingTransactionScope(employeeContext, partnersContext, 2);
+            unitOfWork.UpdateFixed(employeeContext, partnersContext, 1);
+            unitOfWork.UpdateFixed(employeeContext, partnersContext, 2);
+            //await unitOfWork.UpdateUsingTransactionScope(employeeContext, partnersContext, 1);
+            //await unitOfWork.UpdateUsingTransactionScope(employeeContext, partnersContext, 2);
         }
 
         public class UnitOfWork
@@ -39,21 +39,21 @@ namespace EF_DDD
                     partnerContext.SaveChanges();
                     employeeContext.SaveChanges();
                     trans.Commit();
-                    trans.Dispose();
                 });
             }
 
-            public async Task UpdateUsingTransactionScope(EmployeeContext employeeContext, PartnersContext partnerContext, int count)
+            public void UpdateFixed(EmployeeContext employeeContext, PartnersContext partnerContext, int count)
             {
                 var strategy = employeeContext.Database.CreateExecutionStrategy();
-                await strategy.ExecuteAsync(async () =>
-                {
-                    using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+                strategy.Execute(() => {
+                    using var trans = employeeContext.Database.BeginTransaction();
+                    var transactionToDispose = partnerContext.Database.UseTransaction(trans.GetDbTransaction());
                     partnerContext.Partners.Add(new Partner($"John Smith {count}"));
                     employeeContext.Persons.Add(new Person() { Name = $"Richard Keno {count}" });
-                    await partnerContext.SaveChangesAsync();
-                    await employeeContext.SaveChangesAsync();
-                    scope.Complete();
+                    partnerContext.SaveChanges();
+                    employeeContext.SaveChanges();
+                    trans.Commit();
+                    transactionToDispose.Dispose();
                 });
             }
         }
