@@ -20,8 +20,8 @@ namespace EF_DDD
             var employeeContext = new EmployeeContext(ConnectionString);
             var partnersContext = new PartnersContext(employeeContext.Database.GetDbConnection());
             var unitOfWork = new UnitOfWork();
-            unitOfWork.UpdateFixed(employeeContext, partnersContext, 1);
-            unitOfWork.UpdateFixed(employeeContext, partnersContext, 2);
+            await unitOfWork.UpdateFixedAsync(employeeContext, partnersContext, 1);
+            await unitOfWork.UpdateFixedAsync(employeeContext, partnersContext, 2);
             //await unitOfWork.UpdateUsingTransactionScope(employeeContext, partnersContext, 1);
             //await unitOfWork.UpdateUsingTransactionScope(employeeContext, partnersContext, 2);
         }
@@ -48,12 +48,25 @@ namespace EF_DDD
                 strategy.Execute(() => {
                     using var trans = employeeContext.Database.BeginTransaction();
                     var transactionToDispose = partnerContext.Database.UseTransaction(trans.GetDbTransaction());
-                    partnerContext.Partners.Add(new Partner($"John Smith {count}"));
-                    employeeContext.Persons.Add(new Person() { Name = $"Richard Keno {count}" });
                     partnerContext.SaveChanges();
                     employeeContext.SaveChanges();
                     trans.Commit();
                     transactionToDispose.Dispose();
+                });
+            }
+
+            public Task UpdateFixedAsync(EmployeeContext employeeContext, PartnersContext partnerContext, int count)
+            {
+                partnerContext.Partners.Add(new Partner($"John Smith {count}"));
+                employeeContext.Persons.Add(new Person() { Name = $"Richard Keno {count}" });
+                var strategy = employeeContext.Database.CreateExecutionStrategy();
+                return strategy.ExecuteAsync(async () => {
+                    await using var trans = await employeeContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+                    var transactionToDispose = await partnerContext.Database.UseTransactionAsync(trans.GetDbTransaction());
+                    await partnerContext.SaveChangesAsync();
+                    await employeeContext.SaveChangesAsync();
+                    await trans.CommitAsync();
+                    await transactionToDispose.DisposeAsync();
                 });
             }
         }
