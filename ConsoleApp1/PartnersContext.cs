@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Text;
-using EF_DDD.Partnership;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -59,7 +58,7 @@ namespace EF_DDD {
                     modelBuilder.Entity(entityType.ClrType).ToTable(entityType.ClrType.Name);
                 }
             }
-            modelBuilder.ApplyConfiguration(new PartnerConfiguration());
+            modelBuilder.Entity<Partner>().ToTable("ContractingCompany").HasKey(c => c.Id);
             base.OnModelCreating(modelBuilder);
         }
 

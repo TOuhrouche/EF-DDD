@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Text;
-using EF_DDD.Partnership;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
