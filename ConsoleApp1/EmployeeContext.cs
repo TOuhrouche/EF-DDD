@@ -37,13 +37,11 @@ namespace EF_DDD {
 
             if (_connection != null)
             {
-                optionsBuilder.UseLazyLoadingProxies().UseSqlServer(_connection,
-                    options => options.EnableRetryOnFailure().CommandTimeout(300));
+                optionsBuilder.UseLazyLoadingProxies().UseSqlServer(_connection/*, options => options.EnableRetryOnFailure().CommandTimeout(300)*/);
             }
             else
             {
-                optionsBuilder.UseLazyLoadingProxies().UseSqlServer(_connectionString,
-                    options => options.EnableRetryOnFailure().CommandTimeout(300));
+                optionsBuilder.UseLazyLoadingProxies().UseSqlServer(_connectionString/*, options => options.EnableRetryOnFailure().CommandTimeout(300)*/);
             }
 
             if (Debugger.IsAttached) {
